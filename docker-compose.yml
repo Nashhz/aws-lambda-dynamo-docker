@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  serverless-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Map local port 3000 to container port 3000
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - TABLE_NAME=ToDoItems
+    volumes:
+      - .:/usr/src/app # Sync local files with the container
+      - /usr/src/app/node_modules # Prevent overwriting node_modules
+    command: serverless offline --host 0.0.0.0
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - "8000:8000" # Map local port 8000 to container port 8000
+    volumes:
+      - dynamodb_data:/data # Persist DynamoDB data locally
+
+volumes:
+  dynamodb_data:

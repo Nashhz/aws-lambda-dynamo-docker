@@ -1,0 +1,78 @@
+service: todo-api
+
+#043309345029
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-southeast-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:ap-southeast-2:<043309345029>:table/ToDoItems"
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "arn:aws:logs:ap-southeast-2:*:*"
+
+
+functions:
+  createToDo:
+    handler: handler.createToDo
+    events:
+      - http:
+          path: todos
+          method: post
+          cors: true
+
+  getToDos:
+    handler: handler.getToDos
+    events:
+      - http:
+          path: todos
+          method: get
+          cors: true
+
+  updateToDo:
+    handler: handler.updateToDo
+    events:
+      - http:
+          path: todos/{id}
+          method: put
+          cors: true
+
+  deleteToDo:
+    handler: handler.deleteToDo
+    events:
+      - http:
+          path: todos/{id}
+          method: delete
+          cors: true
+
+# resources:
+#   Resources:
+#     ToDoItemsTable:
+#       Type: AWS::DynamoDB::Table
+#       Properties:
+#         TableName: ToDoItems
+#         AttributeDefinitions:
+#           - AttributeName: id
+#             AttributeType: S
+#         KeySchema:
+#           - AttributeName: id
+#             KeyType: HASH
+#         ProvisionedThroughput:
+#           ReadCapacityUnits: 5
+#           WriteCapacityUnits: 5
+
+
+plugins:
+  - serverless-offline
